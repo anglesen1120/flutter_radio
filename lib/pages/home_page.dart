@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
           icon,
           color: HexColor("#ffffff"),
         ),
+        // ignore: deprecated_member_use
         title: new Text(title));
   }
 

@@ -2,11 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_radio/utils/HexColor.dart';
 
 class NowPlaying extends StatelessWidget {
-  const NowPlaying({Key key}) : super(key: key);
+  final String radioTitle;
+  final String radioImageUrl;
+  const NowPlaying({Key key, this.radioTitle, this.radioImageUrl})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(color: HexColor("#182545")),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _nowPlayingText(context, this.radioTitle, this.radioImageUrl)
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _nowPlayingText(BuildContext context, String title, String imageUrl) {
@@ -24,6 +39,11 @@ class NowPlaying extends StatelessWidget {
           "Now Playing",
           textScaleFactor: 0.8,
           style: new TextStyle(color: HexColor("#ffffff")),
+        ),
+        leading: _image(imageUrl, size: 50.0),
+        trailing: Wrap(
+          spacing: -10.0,
+          children: <Widget>[_buildStopIcon(context), _buildShareIcon()],
         ),
       ),
     );
@@ -53,6 +73,22 @@ class NowPlaying extends StatelessWidget {
               offset: Offset(0, 3),
             ),
           ]),
+    );
+  }
+
+  Widget _buildStopIcon(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.stop),
+      color: HexColor("#9097A6"),
+      onPressed: () {},
+    );
+  }
+
+  Widget _buildShareIcon() {
+    return IconButton(
+      icon: Icon(Icons.share),
+      color: HexColor("#9097A6"),
+      onPressed: () {},
     );
   }
 }
