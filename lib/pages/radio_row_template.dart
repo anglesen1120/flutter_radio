@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 
 class RadioRowTemplate extends StatefulWidget {
   final RadioModel radioModel;
+  final bool isFavouriteOnlyRadios;
 
-  const RadioRowTemplate({Key key, this.radioModel}) : super(key: key);
+  const RadioRowTemplate({Key key, this.radioModel, this.isFavouriteOnlyRadios})
+      : super(key: key);
   @override
   _RadioRowTemplateState createState() => _RadioRowTemplateState();
 }
@@ -19,6 +21,10 @@ class _RadioRowTemplateState extends State<RadioRowTemplate> {
   }
 
   Widget _buildSongRow() {
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+    final bool _isSelectdRadio =
+        this.widget.radioModel.id == playerProvider.currentRadio.id;
+
     return ListTile(
       title: new Text(
         this.widget.radioModel.radioName,
@@ -30,26 +36,68 @@ class _RadioRowTemplateState extends State<RadioRowTemplate> {
       trailing: Wrap(
         spacing: -10.0,
         runSpacing: 0.0,
-        children: <Widget>[_buildPlayStopIcon(), _buildAddFavouriteIcon()],
+        children: <Widget>[
+          _buildPlayStopIcon(playerProvider, _isSelectdRadio),
+          _buildAddFavouriteIcon()
+        ],
       ),
     );
   }
 
-  Widget _buildPlayStopIcon() {
+  Widget _buildPlayStopIcon(
+      PlayerProvider playerProvider, bool _isSelectedSong) {
     var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
     return IconButton(
-      icon: Icon(Icons.play_circle_filled),
+      icon: _buildAudioButton(playerProvider, _isSelectedSong),
       onPressed: () {
-        playerProvider.updatePlayerState(RadioPlayerState.PLAYING);
+        if (!playerProvider.isStopped() && _isSelectedSong) {
+          playerProvider.stopRadio();
+        } else {
+          if (!playerProvider.isLoading()) {
+            playerProvider.initAudioPlugin();
+            playerProvider.setAudioPlayer(this.widget.radioModel);
+            playerProvider.playRadio();
+          }
+        }
       },
     );
   }
 
+  Widget _buildAudioButton(PlayerProvider model, bool _isSelectedSong) {
+    if (_isSelectedSong) {
+      if (model.isLoading()) {
+        return Center(
+          child: CircularProgressIndicator(strokeWidth: 2.0),
+        );
+      }
+
+      if (!model.isStopped()) {
+        return Icon(Icons.stop);
+      }
+
+      if (model.isStopped()) {
+        return Icon(Icons.play_circle_filled);
+      }
+    } else {
+      return Icon(Icons.play_circle_filled);
+    }
+
+    return new Container();
+  }
+
   Widget _buildAddFavouriteIcon() {
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: true);
+
     return IconButton(
-      icon: Icon(Icons.favorite_border),
+      icon: this.widget.radioModel.isBookmarked
+          ? Icon(Icons.favorite_border)
+          : Icon(Icons.favorite_border),
       color: HexColor("#9097A6"),
-      onPressed: () {},
+      onPressed: () {
+        playerProvider.radioBookmarked(
+            this.widget.radioModel.id, !this.widget.radioModel.isBookmarked,
+            isFavouriteOnly: this.widget.isFavouriteOnlyRadios);
+      },
     );
   }
 

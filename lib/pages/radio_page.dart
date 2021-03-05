@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_radio/model/radio.dart';
 import 'package:flutter_radio/pages/radio_row_template.dart';
@@ -10,7 +11,8 @@ import 'package:provider/provider.dart';
 import 'now_playing_template.dart';
 
 class RadioPage extends StatefulWidget {
-  RadioPage({Key key}) : super(key: key);
+  final bool isFavouriteOnly;
+  RadioPage({Key key, this.isFavouriteOnly}) : super(key: key);
 
   @override
   _RadioPageState createState() => _RadioPageState();
@@ -19,17 +21,28 @@ class RadioPage extends StatefulWidget {
 class _RadioPageState extends State<RadioPage> {
   final _searchQuery = new TextEditingController();
   Timer _debounce;
+  AudioPlayer _audioPlayer;
+
   @override
   void initState() {
     super.initState();
     var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    playerProvider.initAudioPlugin();
+    playerProvider.resetStreams();
     playerProvider.fetchAllRadios();
-    _searchQuery.addListener(() {
-      var radioProvider = Provider.of<PlayerProvider>(context, listen: false);
-      if (_debounce?.isActive ?? false) _debounce.cancel();
-      _debounce = Timer(const Duration(microseconds: 500), () {
-        radioProvider.fetchAllRadios(searchQuery: _searchQuery.text);
-      });
+
+    _searchQuery.addListener(_onSeachChanged);
+  }
+
+  _onSeachChanged() {
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
+    if (_debounce?.isActive ?? false) _debounce.cancel();
+    _debounce = Timer(const Duration(microseconds: 500), () {
+      playerProvider.fetchAllRadios(
+          searchQuery: _searchQuery.text,
+          isFavouriteOnly: this.widget.isFavouriteOnly);
     });
   }
 
@@ -98,6 +111,39 @@ class _RadioPageState extends State<RadioPage> {
           Spacer(),
         ],
       ),
+    );
+  }
+
+  Widget _noData() {
+    String noDataTxt = "";
+    bool showTextMessage = false;
+
+    if (this.widget.isFavouriteOnly ||
+        (this.widget.isFavouriteOnly && _searchQuery.text.isNotEmpty)) {
+      noDataTxt = "No Favorites";
+      showTextMessage = true;
+    } else if (_searchQuery.text.isNotEmpty) {
+      noDataTxt = "No Radio Found";
+      showTextMessage = true;
+    }
+
+    return Column(
+      children: [
+        new Expanded(
+          child: Center(
+            child: showTextMessage
+                ? new Text(
+                    noDataTxt,
+                    textScaleFactor: 1,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : CircularProgressIndicator(),
+          ),
+        ),
+      ],
     );
   }
 

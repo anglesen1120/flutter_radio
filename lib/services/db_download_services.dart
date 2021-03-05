@@ -56,7 +56,7 @@ class DBDownloadServices {
       }
     }
     List<Map<String, dynamic>> _results =
-        await DatabaseServices.query(RadioModel.table);
+        await DatabaseServices.rawQuery(rawQuery);
 
     List<RadioModel> radioModel = new List<RadioModel>();
     radioModel = _results.map((item) => RadioModel.fromMap(item)).toList();
