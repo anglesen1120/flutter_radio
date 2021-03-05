@@ -15,8 +15,10 @@ class PlayerProvider with ChangeNotifier {
     _radiosFetcher = List<RadioModel>();
   }
 
-  fetchAllRadios() async {
-    _radiosFetcher = await DBDownloadServices.fetchLocalDB();
+  fetchAllRadios({String searchQuery = ""}) async {
+    _radiosFetcher =
+        await DBDownloadServices.fetchLocalDB(searchQuery: searchQuery);
+    notifyListeners();
   }
 
   void updatePlayerState(RadioPlayerState radioPlayerState) {

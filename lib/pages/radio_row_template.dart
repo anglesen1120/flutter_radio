@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_radio/model/radio.dart';
-import 'package:flutter_radio/utils/HexColor.dart';
+import 'package:flutter_radio/services/player_provider.dart';
+import 'package:flutter_radio/utils/hex_color.dart';
+import 'package:provider/provider.dart';
 
 class RadioRowTemplate extends StatefulWidget {
   final RadioModel radioModel;
@@ -34,9 +36,12 @@ class _RadioRowTemplateState extends State<RadioRowTemplate> {
   }
 
   Widget _buildPlayStopIcon() {
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
     return IconButton(
       icon: Icon(Icons.play_circle_filled),
-      onPressed: () {},
+      onPressed: () {
+        playerProvider.updatePlayerState(RadioPlayerState.PLAYING);
+      },
     );
   }
 

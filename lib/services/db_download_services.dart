@@ -13,11 +13,12 @@ class DBDownloadServices {
 
   static Future<RadioAPIModel> fetchAllRadios() async {
     final serviceResponse =
-        await WebServices().getData(Config.api_URL, new RadioAPIModel());
+        await WebServices().getData(Config.apiURL, new RadioAPIModel());
     return serviceResponse;
   }
 
-  static Future<List<RadioModel>> fetchLocalDB() async {
+  static Future<List<RadioModel>> fetchLocalDB(
+      {String searchQuery = "", bool isFavouriteOnly = false}) async {
     if (!await isLocalDBAvailable()) {
       // HTTP Call to fetch JSON Data
       RadioAPIModel radioAPIModel = await fetchAllRadios();
@@ -33,33 +34,33 @@ class DBDownloadServices {
         });
       }
     }
-    // String rawQuery = "";
-    // if (!isFavouriteOnly) {
-    //   rawQuery =
-    //       "SELECT radios.id, radioName, radioURL, radioURL, radioDesc, radioWebsite, radioPic,"
-    //       "isFavourite FROM radios LEFT JOIN radios_bookmarks ON radios_bookmarks.id = radios.id ";
+    String rawQuery = "";
+    if (!isFavouriteOnly) {
+      rawQuery =
+          "SELECT radios.id, radioName, radioURL, radioURL, radioDesc, radioWebsite, radioPic,"
+          "isFavourite FROM radios LEFT JOIN radios_bookmarks ON radios_bookmarks.id = radios.id ";
 
-    //   if (searchQuery.trim() != "") {
-    //     rawQuery = rawQuery +
-    //         " WHERE radioName LIKE '%$searchQuery%' OR radioDesc LIKE '%$searchQuery%' ";
-    //   }
-    // } else {
-    //   rawQuery =
-    //       "SELECT radios.id, radioName, radioURL, radioURL, radioDesc, radioWebsite, radioPic,"
-    //       "isFavourite FROM radios INNER JOIN radios_bookmarks ON radios_bookmarks.id = radios.id "
-    //       "WHERE isFavourite = 1 ";
+      if (searchQuery.trim() != "") {
+        rawQuery = rawQuery +
+            " WHERE radioName LIKE '%$searchQuery%' OR radioDesc LIKE '%$searchQuery%' ";
+      }
+    } else {
+      rawQuery =
+          "SELECT radios.id, radioName, radioURL, radioURL, radioDesc, radioWebsite, radioPic,"
+          "isFavourite FROM radios INNER JOIN radios_bookmarks ON radios_bookmarks.id = radios.id "
+          "WHERE isFavourite = 1 ";
 
-    //   if (searchQuery.trim() != "") {
-    //     rawQuery = rawQuery +
-    //         " AND radioName LIKE '%$searchQuery%' OR radioDesc LIKE '%$searchQuery%' ";
-    //   }
-    // }
+      if (searchQuery.trim() != "") {
+        rawQuery = rawQuery +
+            " AND radioName LIKE '%$searchQuery%' OR radioDesc LIKE '%$searchQuery%' ";
+      }
+    }
     List<Map<String, dynamic>> _results =
         await DatabaseServices.query(RadioModel.table);
 
     List<RadioModel> radioModel = new List<RadioModel>();
     radioModel = _results.map((item) => RadioModel.fromMap(item)).toList();
-
+    print(radioModel.length);
     return radioModel;
   }
 }

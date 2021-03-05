@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_radio/pages/radio_page.dart';
-import 'package:flutter_radio/utils/HexColor.dart';
+import 'package:flutter_radio/utils/hex_color.dart';
 
 class HomePage extends StatefulWidget {
   @override

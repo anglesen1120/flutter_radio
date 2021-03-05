@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_radio/model/radio.dart';
 import 'package:flutter_radio/pages/radio_row_template.dart';
 import 'package:flutter_radio/services/db_download_services.dart';
-import 'package:flutter_radio/utils/HexColor.dart';
-
+import 'package:flutter_radio/services/player_provider.dart';
+import 'package:flutter_radio/utils/hex_color.dart';
+import 'package:provider/provider.dart';
 import 'now_playing_template.dart';
 
 class RadioPage extends StatefulWidget {
@@ -14,6 +17,22 @@ class RadioPage extends StatefulWidget {
 }
 
 class _RadioPageState extends State<RadioPage> {
+  final _searchQuery = new TextEditingController();
+  Timer _debounce;
+  @override
+  void initState() {
+    super.initState();
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+    playerProvider.fetchAllRadios();
+    _searchQuery.addListener(() {
+      var radioProvider = Provider.of<PlayerProvider>(context, listen: false);
+      if (_debounce?.isActive ?? false) _debounce.cancel();
+      _debounce = Timer(const Duration(microseconds: 500), () {
+        radioProvider.fetchAllRadios(searchQuery: _searchQuery.text);
+      });
+    });
+  }
+
   RadioModel radioModel = new RadioModel(
       id: 1,
       radioName: "Test radio 1",
@@ -27,10 +46,7 @@ class _RadioPageState extends State<RadioPage> {
           _appLogo(),
           _searchBar(),
           _radioList(),
-          NowPlaying(
-            radioTitle: "Current Radio Playing",
-            radioImageUrl: "http://isharpeners.com/sc_logo.png",
-          )
+          _nowPlaying(),
         ],
       ),
     );
@@ -76,7 +92,7 @@ class _RadioPageState extends State<RadioPage> {
                 contentPadding: EdgeInsets.all(5),
                 hintText: 'Search Radio',
               ),
-              // controller: _searchQuery,
+              controller: _searchQuery,
             ),
           ),
           Spacer(),
@@ -113,6 +129,17 @@ class _RadioPageState extends State<RadioPage> {
         }
         return CircularProgressIndicator();
       },
+    );
+  }
+
+  Widget _nowPlaying() {
+    var providerPlayer = Provider.of<PlayerProvider>(context, listen: true);
+    return Visibility(
+      visible: providerPlayer.getPlayerState() == RadioPlayerState.PLAYING,
+      child: NowPlaying(
+        radioTitle: "Current Radio Playing",
+        radioImageUrl: "http://isharpeners.com/sc_logo.png",
+      ),
     );
   }
 }

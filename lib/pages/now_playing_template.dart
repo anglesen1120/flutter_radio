@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_radio/utils/HexColor.dart';
+import 'package:flutter_radio/services/player_provider.dart';
+import 'package:flutter_radio/utils/hex_color.dart';
+import 'package:provider/provider.dart';
 
 class NowPlaying extends StatelessWidget {
   final String radioTitle;
@@ -77,10 +79,13 @@ class NowPlaying extends StatelessWidget {
   }
 
   Widget _buildStopIcon(BuildContext context) {
+    var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
     return IconButton(
       icon: Icon(Icons.stop),
       color: HexColor("#9097A6"),
-      onPressed: () {},
+      onPressed: () {
+        playerProvider.updatePlayerState(RadioPlayerState.STOPPED);
+      },
     );
   }
 
