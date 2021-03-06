@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 class NowPlaying extends StatelessWidget {
   final String radioTitle;
   final String radioImageUrl;
+
   const NowPlaying({Key key, this.radioTitle, this.radioImageUrl})
       : super(key: key);
 
@@ -40,12 +41,17 @@ class NowPlaying extends StatelessWidget {
         subtitle: new Text(
           "Now Playing",
           textScaleFactor: 0.8,
-          style: new TextStyle(color: HexColor("#ffffff")),
+          style: new TextStyle(
+            color: HexColor("#ffffff"),
+          ),
         ),
         leading: _image(imageUrl, size: 50.0),
         trailing: Wrap(
           spacing: -10.0,
-          children: <Widget>[_buildStopIcon(context), _buildShareIcon()],
+          children: <Widget>[
+            _buildStopIcon(context),
+            _buildShareIcon(),
+          ],
         ),
       ),
     );
@@ -80,11 +86,12 @@ class NowPlaying extends StatelessWidget {
 
   Widget _buildStopIcon(BuildContext context) {
     var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
     return IconButton(
       icon: Icon(Icons.stop),
       color: HexColor("#9097A6"),
       onPressed: () {
-        playerProvider.updatePlayerState(RadioPlayerState.STOPPED);
+        playerProvider.stopRadio();
       },
     );
   }

@@ -6,6 +6,8 @@ class FavRadioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new RadioPage();
+    return new RadioPage(
+      isFavouriteOnly: true,
+    );
   }
 }

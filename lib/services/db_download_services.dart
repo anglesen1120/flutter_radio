@@ -17,8 +17,10 @@ class DBDownloadServices {
     return serviceResponse;
   }
 
-  static Future<List<RadioModel>> fetchLocalDB(
-      {String searchQuery = "", bool isFavouriteOnly = false}) async {
+  static Future<List<RadioModel>> fetchLocalDB({
+    String searchQuery = "",
+    bool isFavouriteOnly = false,
+  }) async {
     if (!await isLocalDBAvailable()) {
       // HTTP Call to fetch JSON Data
       RadioAPIModel radioAPIModel = await fetchAllRadios();
@@ -60,7 +62,6 @@ class DBDownloadServices {
 
     List<RadioModel> radioModel = new List<RadioModel>();
     radioModel = _results.map((item) => RadioModel.fromMap(item)).toList();
-    print(radioModel.length);
     return radioModel;
   }
 }

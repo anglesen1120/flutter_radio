@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_radio/pages/fav_radios_page.dart';
 import 'package:flutter_radio/pages/radio_page.dart';
 import 'package:flutter_radio/utils/hex_color.dart';
 
@@ -9,7 +10,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final List<Widget> _childern = [new RadioPage(), new Text("Page 2")];
+  final List<Widget> _childern = [
+    new RadioPage(isFavouriteOnly: false),
+    FavRadioPage(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new SafeArea(
@@ -32,16 +42,22 @@ class _HomePageState extends State<HomePage> {
 
   _bottomNavItem(IconData icon, String title) {
     return BottomNavigationBarItem(
-        icon: new Icon(
-          icon,
-          color: HexColor("#6d7381"),
-        ),
-        activeIcon: new Icon(
-          icon,
+      icon: new Icon(
+        icon,
+        color: HexColor("#6d7381"),
+      ),
+      activeIcon: new Icon(
+        icon,
+        color: HexColor("#ffffff"),
+      ),
+      // ignore: deprecated_member_use
+      title: new Text(
+        title,
+        style: TextStyle(
           color: HexColor("#ffffff"),
         ),
-        // ignore: deprecated_member_use
-        title: new Text(title));
+      ),
+    );
   }
 
   void onTabTapped(int index) {

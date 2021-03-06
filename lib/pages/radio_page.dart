@@ -148,20 +148,22 @@ class _RadioPageState extends State<RadioPage> {
   }
 
   Widget _radioList() {
-    return new FutureBuilder(
-      future: DBDownloadServices.fetchLocalDB(),
-      builder: (BuildContext context, AsyncSnapshot<List<RadioModel>> radios) {
-        if (radios.hasData) {
+    return Consumer<PlayerProvider>(
+      builder: (context, radioModel, child) {
+        if (radioModel.totalRecords > 0) {
           return new Expanded(
             child: Padding(
               child: ListView(
                 children: <Widget>[
                   ListView.separated(
-                    itemCount: radios.data.length,
+                    itemCount: radioModel.totalRecords,
                     physics: ScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return RadioRowTemplate(radioModel: radios.data[index]);
+                      return RadioRowTemplate(
+                        radioModel: radioModel.allRadio[index],
+                        isFavouriteOnlyRadios: this.widget.isFavouriteOnly,
+                      );
                     },
                     separatorBuilder: (context, index) {
                       return Divider();
@@ -173,6 +175,9 @@ class _RadioPageState extends State<RadioPage> {
             ),
           );
         }
+        if (radioModel.totalRecords == 0) {
+          return Expanded(child: _noData());
+        }
         return CircularProgressIndicator();
       },
     );
@@ -183,8 +188,8 @@ class _RadioPageState extends State<RadioPage> {
     return Visibility(
       visible: providerPlayer.getPlayerState() == RadioPlayerState.PLAYING,
       child: NowPlaying(
-        radioTitle: "Current Radio Playing",
-        radioImageUrl: "http://isharpeners.com/sc_logo.png",
+        radioTitle: providerPlayer.currentRadio.radioName,
+        radioImageUrl: providerPlayer.currentRadio.radioPic,
       ),
     );
   }

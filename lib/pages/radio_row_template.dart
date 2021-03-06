@@ -16,12 +16,18 @@ class RadioRowTemplate extends StatefulWidget {
 
 class _RadioRowTemplateState extends State<RadioRowTemplate> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return _buildSongRow();
   }
 
   Widget _buildSongRow() {
     var playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+
     final bool _isSelectdRadio =
         this.widget.radioModel.id == playerProvider.currentRadio.id;
 
@@ -29,7 +35,9 @@ class _RadioRowTemplateState extends State<RadioRowTemplate> {
       title: new Text(
         this.widget.radioModel.radioName,
         style: new TextStyle(
-            fontWeight: FontWeight.bold, color: HexColor("#182545")),
+          fontWeight: FontWeight.bold,
+          color: HexColor("#182545"),
+        ),
       ),
       leading: _image(this.widget.radioModel.radioPic),
       subtitle: new Text(this.widget.radioModel.radioDesc, maxLines: 2),
@@ -95,8 +103,10 @@ class _RadioRowTemplateState extends State<RadioRowTemplate> {
       color: HexColor("#9097A6"),
       onPressed: () {
         playerProvider.radioBookmarked(
-            this.widget.radioModel.id, !this.widget.radioModel.isBookmarked,
-            isFavouriteOnly: this.widget.isFavouriteOnlyRadios);
+          this.widget.radioModel.id,
+          !this.widget.radioModel.isBookmarked,
+          isFavouriteOnly: this.widget.isFavouriteOnlyRadios,
+        );
       },
     );
   }
